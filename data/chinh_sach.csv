@@ -1,0 +1,7 @@
+loai_su_co,tre_tu_phut,tre_den_phut,muc_bu,ghi_chu,nguon
+giao_tre,0,19,0,"Trễ dưới 20 phút so với giờ giao dự kiến: không bù, giải thích ngưỡng",(tự đặt)
+giao_tre,20,39,15000,"Voucher 15.000đ — bản nháp, nhân viên duyệt",(tự đặt)
+giao_tre,40,59,30000,"Voucher 30.000đ — bản nháp, nhân viên duyệt",(tự đặt)
+giao_tre,60,9999,50000,"Voucher 50.000đ — mức tối đa đề xuất tự động",(tự đặt)
+han_muc,,,50000,"Hạn mức đề xuất tự động tối đa cho một đơn; khách đòi cao hơn → chuyển nhân viên",(tự đặt)
+chuyen_nhan_vien,,,,"Chuyển nhân viên khi: đơn đã huỷ · khách có ≥3 khiếu nại giao trễ trong 30 ngày · đòi vượt hạn mức · nghi ngộ độc / dị vật · không thuộc giao trễ (thiếu món, sai món…)",(tự đặt)
