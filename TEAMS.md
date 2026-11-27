@@ -4,16 +4,17 @@
 > Giữ nguyên tên file `TEAMS.md` ở thư mục gốc repo, giữ nguyên các dòng `- Tên nhóm:` … và tiêu đề cột của bảng. Chỉ thay chỗ `____`.
 > Kiểm bằng `python run.py check`: phần "Kiểm TEAMS.md" không báo gì là đúng format.
 
-- Tên nhóm: ____
-- Lớp: ____
-- Track: ____
-- Link repo: ____
+- Tên nhóm: BaChangLinhNguLam
+- Lớp: L3A
+- Track: D
+- Link repo: https://github.com/devouring-blade/K5-Day15-L3A-BaChangLinhNguLam
 
 | STT | Họ và tên | Mã học viên | Vai trò | Phần việc chính |
 |---|---|---|---|---|
-| 1 | ____ | ____ | Đội trưởng | ____ |
-| 2 | ____ | ____ | Thành viên | ____ |
-| 3 | ____ | ____ | Thành viên | ____ |
+| 1 | Nguyễn Sỹ Huy Kiên | 2A202603641 | Đội trưởng | Bản chạy thử: nối model, agent và công cụ (codebase/) |
+| 2 | Lê Minh Phụng | 2A202603693 | Thành viên | Bằng chứng pain: khảo sát và tổng hợp (evidence/) |
+| 3 | Vũ Lê Hoàng | 2A202603542 | Thành viên | Data chạy thử và bộ câu thử (data/, eval/) |
+| 4 | Đào Trường Vũ | 2A202603721 | Thành viên | Đào review công khai và mô phỏng chi phí (evidence/, cost/) |
 
 **Quy tắc điền**
 - **Lớp:** `L3A` hoặc `L3B`. **Track:** một chữ `A` (EdTech), `B` (Y tế), `C` (Du lịch), `D` (Thương mại điện tử), `E` (Tài chính) hoặc `F` (Làn khác). **Link repo:** link GitHub công khai của nhóm.
