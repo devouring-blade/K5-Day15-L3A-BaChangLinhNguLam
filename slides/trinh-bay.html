@@ -244,5 +244,8 @@ document.getElementById('bar').style.width=((i+1)/S.length*100)+'%';history.repl
 function go(d){i=Math.max(0,Math.min(S.length-1,i+d));show()}
 document.addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(1)}
 if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1)}if(e.key==='f')document.documentElement.requestFullscreen()});
+// Mở bằng file (file://) thì nút trỏ về server đang chạy: mặc định cổng 8001, đổi bằng #?port=8000 hoặc sửa số dưới
+if(location.protocol==='file:'){const port=(new URLSearchParams(location.search).get('port'))||'8001';
+document.querySelectorAll('a[href^="/"]').forEach(a=>a.href='http://localhost:'+port+a.getAttribute('href'))}
 show();
 </script></body></html>
