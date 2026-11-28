@@ -21,7 +21,7 @@
 | | |
 |---|---|
 | Dùng để làm gì | nguồn cho công cụ `get_policy` và `compute_delay_compensation` (code tính mức bù) |
-| Từ đâu | **nhóm tự đặt** — mốc phút trễ và mức voucher; đối chiếu trang trợ giúp công khai của app giao đồ ăn: __ (link + ngày xem, Hoàng bổ sung) |
+| Từ đâu | **nhóm tự đặt** — mốc phút trễ và mức voucher. Tham khảo cấu trúc từ chương trình "Giao nhanh đúng hẹn" của sàn Shopee (https://help.shopee.vn/portal/4/article/147164, xem 28/11/2026): trễ → 1 voucher, loại trừ đơn huỷ và trễ do người mua; trang này ghi rõ **không áp dụng cho ShopeeFood** và không công bố giá trị voucher → các mức tiền là tự đặt |
 | Xử lý những bước gì | viết tay thành bảng: `< 20 phút` → 0 · `20–39` → 15.000đ · `40–59` → 30.000đ · `≥ 60` → 50.000đ · hạn mức tự động 50.000đ · danh sách ca chuyển nhân viên |
 | Số dòng / số đoạn | 6 dòng |
 | Phiên bản / ngày lấy | v1 · 27/11/2026 |

@@ -13,6 +13,7 @@ Data BTC cấp đã dùng (nếu có — không commit nguyên file): không dù
   3. Muốn khiếu nại: vào mục hỗ trợ của đơn, chọn lý do theo menu, mô tả, chờ phản hồi.
   4. Nhận (hoặc không) voucher / hoàn tiền; nhiều người bỏ qua không khiếu nại.
 - Công cụ / AI đang dùng: theo file track D của bộ đề, trợ lý "Trò chuyện với Shopee" chủ yếu chạy theo menu có sẵn (trang trợ giúp, BTC kiểm 11/11/2026). Phần khiếu nại giao trễ cụ thể trong app: **chưa kiểm**.
+- Chính sách bù giao trễ công khai (trang trợ giúp Shopee, xem 28/11/2026, https://help.shopee.vn/portal/4/article/147164): chương trình "Giao nhanh đúng hẹn" của **sàn Shopee** tặng 01 voucher khi đơn giao sau ngày Shopee đảm bảo, giá trị voucher do Shopee quyết định; không áp dụng khi đơn bị huỷ, khi trễ do người mua (không nghe máy), và **không áp dụng cho đơn ShopeeFood**. Chính sách bù giao trễ riêng cho đơn ShopeeFood: **chưa tìm thấy trang công khai**.
 
 ## §1. Người dùng & bằng chứng *(guide 1.1, 1.2)*
 - Người dùng chính: sinh viên / người đi làm trẻ đặt đồ ăn qua app giao đồ ăn vài lần mỗi tuần, vừa nhận một đơn bị giao trễ so với giờ dự kiến.
@@ -44,6 +45,7 @@ Data BTC cấp đã dùng (nếu có — không commit nguyên file): không dù
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 - **Trợ lý hỗ trợ trong app giao đồ ăn (vd "Trò chuyện với Shopee")**: đáng học — đi theo menu lý do có sẵn, dễ cho khách chọn · đáng né — khách không biết trước được bù gì, phải chờ người · mình khác — tính ngay phút trễ và mức bù theo chính sách bằng code, AI giải thích lý do, ca vượt hạn mức mới chuyển người. *(cần thành viên thử trực tiếp và ghi lại — chưa kiểm)*
+- **Chương trình "Giao nhanh đúng hẹn" của sàn Shopee** (https://help.shopee.vn/portal/4/article/147164, xem 28/11/2026): đáng học — quy tắc rõ, voucher tự hiện ở trang đơn hàng, có loại trừ rõ (đơn huỷ, trễ do người mua) · đáng né — khách không biết trước giá trị voucher, và đơn đồ ăn (ShopeeFood) bị loại trừ · mình khác — áp cho đơn đồ ăn, nêu ngay số phút trễ và mức bù theo bậc, giải thích khi chưa đủ điều kiện.
 - **Chatbot chung (ChatGPT) khi khách tự hỏi**: đáng học — hiểu lời khách viết tự do · đáng né — không có dữ liệu đơn, dễ bịa chính sách và số tiền · mình khác — mọi con số lấy từ công cụ, không có thì nói không có.
 
 ## §4. Thiết kế *(guide 2.2, 3.2)*
@@ -148,6 +150,7 @@ flowchart TD
 | 27/11 trước CP2 | Chuyển lát cắt từ thiếu / sai món sang giao trễ | Review ShopeeFood: thiếu món 0/150, giao trễ 12/50 review 1–3 sao (`evidence/data-mining.md`) |
 | 28/11 trước CP3 | §5: cột "Câu thử" trỏ đúng mã câu T01–T20, gộp kịch bản trùng; §6: điền mức voucher ví dụ | Bộ câu thử đã viết lúc CP2 (`eval/benchmark.csv`); không đổi câu thử, không đổi chuẩn "đạt" |
 | 28/11 trước CP3 | Nối model thật OpenAI `gpt-5-nano` vào `codebase/ai.py` | Yêu cầu CP3: bản chạy thử gọi AI thật |
+| 28/11 trước CP3 | §0, §3: thêm nguồn chính thức chương trình "Giao nhanh đúng hẹn" của Shopee | Thay cho ảnh chụp app; trang trợ giúp công khai |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
 
