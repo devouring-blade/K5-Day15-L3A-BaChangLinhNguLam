@@ -53,5 +53,5 @@
 
 - Một app, một nền tảng (Google Play), 150 review trong ~2 tuần. Review Play Store hay nói về **app** (lag, lỗi) hơn là về **một đơn**; người viết thường đang bực, nên % trong review không phải % mọi người dùng.
 - Người thiếu món có thể khiếu nại trong app mà không viết review → review có thể đánh giá thấp tần suất thiếu món.
-- Nhãn gắn theo định nghĩa ở mục 1; người thứ hai đọc lại độc lập ít nhất 30 dòng để kiểm độ khớp: __/30.
+- Nhãn gắn theo định nghĩa ở mục 1; người thứ hai (Nguyễn Sỹ Huy Kiên) gắn nhãn lại độc lập 30 dòng đầu, che cột `nhan`: khớp 30/30.
 - → Kiểm lại bằng: khảo sát ≥20 người ngoài nhóm (hỏi số lần thiếu / sai món **và** giao trễ trong 1 tháng qua).
