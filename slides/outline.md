@@ -20,4 +20,30 @@ Ai nói trang nào (mỗi người ≥1 phần):
 
 | Trang | Người nói |
 |---|---|
-| | |
+| 1 · Người dùng & pain | Lê Minh Phụng (làm khảo sát) |
+| 2 · Vì sao chọn bài này | Đào Trường Vũ (đào review) |
+| 3 · Giải pháp | Nguyễn Sỹ Huy Kiên (bản chạy thử) |
+| 4 · Demo live | Nguyễn Sỹ Huy Kiên — gõ lệnh; Vũ Lê Hoàng đọc câu thử |
+| 5 · Đánh giá thế nào | Vũ Lê Hoàng (câu thử, data) |
+| 6 · Chi phí khi dùng thật | Đào Trường Vũ (mô phỏng chi phí) |
+| 7 · Kết luận | Lê Minh Phụng |
+| 8 · Nếu có thêm 1 tuần | Vũ Lê Hoàng |
+
+## Phao hỏi đáp — giám khảo hỏi BẤT KỲ AI (rubric R7)
+
+**Ai cũng phải trả lời được 4 câu:**
+
+1. **Vì sao chọn workflow, không chọn agent?** Các bước luôn giống nhau (đọc tin → tra đơn → tính bù → kiểm), nên workflow rẻ và dễ đo. Để AI tự gọi công cụ thì dễ bỏ bước kiểm hạn mức. Không có vai nào khác nhau nên không cần nhiều agent. (`spec.md` §4)
+2. **Lỗi nguy hiểm nhất là gì?** Bù sai tiền / vượt hạn mức (khách nài, doạ, chèn lệnh) → chặn bằng: tiền chỉ tính bằng code (`compute_delay_compensation`), code kiểm số tiền sau AI, mọi voucher là bản nháp nhân viên duyệt. Ca nguy hiểm cho người: khách báo đau bụng sau khi ăn → dừng bù, chuyển nhân viên ngay (T15).
+3. **Chi phí / task thành công tính thế nào?** Chạy thật 50 phiên giả lập theo 3 persona từ khảo sát → đo token thật → nhân giá model → chia tỉ lệ đạt (20/20 lượt 3). gpt-5-nano ≈ $0,00081 ≈ 21 ₫. Chi phí lớn thật là voucher và giờ công duyệt, không phải model. (`cost/cost-estimate.md`)
+4. **Phần mình làm là gì?** Xem bảng dưới — nói đúng file có tên mình.
+
+**Từng người chuẩn bị thêm:**
+
+| Người | Phần mình (TEAMS.md) | Câu dễ bị hỏi + ý trả lời |
+|---|---|---|
+| Nguyễn Sỹ Huy Kiên | `codebase/` — agent, tools, nối model | *AI quyết định gì, code quyết định gì?* AI đọc tin (mã đơn, vấn đề, đòi thêm, yêu cầu cấm) và viết câu trả lời; code tính phút trễ, mức bù, chọn hướng, kiểm số tiền. · *Lượt 2 có gì lạ?* Hàm bắt số tiền bắt nhầm mã đơn DH1001 → mọi câu AI viết bị loại; sửa và chạy lượt 3. · *Câu thử lạ thì sao?* Không có mã đơn → hỏi lại; mã không có → nói không tìm thấy; số tiền luôn từ code. |
+| Lê Minh Phụng | Khảo sát + `evidence/summary.md` | *Khảo sát hỏi ai, bao nhiêu người?* 23 phiếu, 21 người có đặt đơn, ngoài nhóm, ẩn danh, hỏi "5 đơn gần nhất". · *Review và khảo sát lệch nhau chỗ nào?* Khảo sát thấy thiếu món cũng nhiều (65%), review thì gần như không — vì review chấm app, người thiếu món xử lý với quán. Giao trễ khớp ở cả hai. |
+| Vũ Lê Hoàng | `data/`, `eval/benchmark.csv` | *Data từ đâu?* 12 đơn giả viết tay phủ đủ ca trễ 12→75 phút, đơn huỷ, đơn 300k; chính sách tự đặt, tham khảo "Giao nhanh đúng hẹn" của Shopee. · *Vì sao tin được 20/20?* Tiêu chí kiểm được, người thứ hai chấm lại 5/5; nhưng bộ câu nhỏ, nhóm biết trước → cần câu thử lạ. |
+| Đào Trường Vũ | Review + `cost/` | *Đếm review thế nào?* 150 review mới nhất, mọi mức sao, mẫu số 150, nhãn định nghĩa trước, script `evidence/count_reviews.py`, người thứ hai khớp 30/30. · *Quy mô 10.000 / 100.000 lấy đâu?* Tự ước tính, ghi rõ; mức có nguồn là 910 người (khoá AI20K). |
+
