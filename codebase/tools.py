@@ -77,10 +77,28 @@ def draft_voucher(ma_don: str, so_tien: int, ly_do: str) -> dict:
 
 
 @tool
-def escalate_to_human(ma_don: str, tom_tat: str) -> dict:
-    """escalate_to_human · input: mã đơn (có thể rỗng), tóm tắt · output: ca chờ nhân viên
-    · có tác động ra ngoài (tạo ca) — đảo được, nhân viên đóng ca. Ở bản chạy thử chỉ trả ca giả."""
-    return {"ma_don": ma_don, "tom_tat": tom_tat, "trang_thai": "cho_nhan_vien"}
+def escalate_to_human(ma_don: str, tom_tat: str, loai: str = "khac", tin_nhan: str = "", tro_ly_da_noi: str = "") -> dict:
+    """escalate_to_human · input: mã đơn (có thể rỗng), tóm tắt, loại ca (suc_khoe | da_huy | nhieu_lan | ngoai_pham_vi),
+    tin nhắn gốc, trợ lý đã nói gì · output: ca chờ nhân viên (ca sức khoẻ ưu tiên KHẨN)
+    · có tác động: tạo ca trong hàng chờ nhân viên — đảo được, nhân viên đóng ca.
+    Chỉ lưu vào bảng khi chạy giao diện web (biến môi trường WEB_DEMO=1); lúc chạy eval / simulate chỉ trả ca, không ghi."""
+    ca = {"ma_don": ma_don, "tom_tat": tom_tat, "loai": loai, "uu_tien": "khan" if loai == "suc_khoe" else "thuong",
+          "trang_thai": "cho_nhan_vien"}
+    if os.environ.get("WEB_DEMO") != "1":
+        return ca
+    order = {}
+    for row in _read("don_hang.csv"):
+        if row["ma_don"].upper() == (ma_don or "").upper():
+            order = row
+    ca.update(kieu="chuyen_nhan_vien", quan=order.get("quan", ""), gio_giao=order.get("gio_giao_thuc_te", ""),
+              gia_tri=order.get("tong_tien", ""), tin_nhan=tin_nhan[:300], tro_ly_da_noi=tro_ly_da_noi,
+              tao_luc=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    with _LOCK_ESC:
+        rows = _load()
+        ca["ma_phieu"] = "CA%04d" % (sum(1 for r in rows if r.get("kieu") == "chuyen_nhan_vien") + 1)
+        rows.append(ca)
+        _save(rows)
+    return ca
 
 
 # ---- Bảng khiếu nại + duyệt (thêm sau CP4) ----------------------------------------
@@ -92,6 +110,7 @@ AUTO_APPROVE_MAX = 15000          # tự duyệt khi mức bù ≤ 15.000đ …
 AUTO_APPROVE_MAX_HISTORY = 0      # … và khách chưa khiếu nại giao trễ lần nào trong 30 ngày
 _RUNTIME = os.path.join(DATA, "runtime", "khieu_nai.json")
 _LOCK = _threading.Lock()
+_LOCK_ESC = _LOCK
 
 
 def _load():
@@ -131,9 +150,9 @@ def save_complaint(ma_don: str, ma_khach: str, phut_tre: int, muc_bu: int, ho_te
     with _LOCK:
         rows = _load()
         for r in rows:
-            if r["ma_don"] == ma_don:
+            if r["ma_don"] == ma_don and r.get("kieu") != "chuyen_nhan_vien":
                 return dict(r, trung=True)
-        rec = {"ma_phieu": "KN%04d" % (len(rows) + 1), "ma_don": ma_don, "ma_khach": ma_khach,
+        rec = {"ma_phieu": "KN%04d" % (sum(1 for r in rows if r.get("kieu") != "chuyen_nhan_vien") + 1), "ma_don": ma_don, "ma_khach": ma_khach,
                "phut_tre": phut_tre, "muc_bu": muc_bu, "ho_ten": ho_ten, "sdt": sdt,
                "trang_thai": "da_duyet_tu_dong" if tu_duyet else "cho_nhan_vien",
                "ly_do_duyet": ly_do_duyet, "tao_luc": datetime.now().strftime(TIME_FMT), "nguoi_duyet": "he_thong" if tu_duyet else ""}
@@ -155,8 +174,11 @@ def review_complaint(ma_phieu: str, quyet_dinh: str, nguoi_duyet: str = "nhan_vi
     with _LOCK:
         rows = _load()
         for r in rows:
-            if r["ma_phieu"] == ma_phieu and r["trang_thai"] == "cho_nhan_vien":
-                r["trang_thai"] = "da_duyet" if quyet_dinh == "duyet" else "tu_choi"
+            if r.get("ma_phieu") == ma_phieu and r["trang_thai"] == "cho_nhan_vien":
+                if r.get("kieu") == "chuyen_nhan_vien":
+                    r["trang_thai"] = "da_xu_ly"
+                else:
+                    r["trang_thai"] = "da_duyet" if quyet_dinh == "duyet" else "tu_choi"
                 r["nguoi_duyet"] = nguoi_duyet
                 r["duyet_luc"] = datetime.now().strftime(TIME_FMT)
                 _save(rows)

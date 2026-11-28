@@ -58,6 +58,7 @@ def _parse(text):
     except (ValueError, json.JSONDecodeError):
         note("bước 1: model không trả JSON — dùng mặc định")
         info = {}
+    info["_text"] = text
     ids = re.findall(r"\bDH\d{3,}\b", text.upper())
     ma = (info.get("ma_don") or "").upper()
     info["ma_don"] = ma if ma in ids else (ids[0] if ids else None)
@@ -73,7 +74,7 @@ def _decide(info):
     """CODE chọn hành động theo chính sách — AI không quyết số tiền."""
     facts = {"ma_don": info["ma_don"]}
     if "suc_khoe" in info["van_de"] and not info["ma_don"]:
-        escalate_to_human("", "khách báo dấu hiệu sức khoẻ sau khi ăn")
+        escalate_to_human("", "Khách báo dấu hiệu sức khoẻ sau khi ăn", "suc_khoe", info["_text"], "khuyên đi khám / gọi 115")
         return "chuyen_nhan_vien", dict(facts, loai="suc_khoe", ly_do="khách báo dấu hiệu sức khoẻ — chuyển nhân viên ngay, khuyên đi khám nếu nặng")
     if not info["ma_don"]:
         return "hoi_lai", dict(facts, loai="thieu_ma", ly_do="khách chưa ghi mã đơn")
@@ -82,14 +83,14 @@ def _decide(info):
         return "hoi_lai", dict(facts, loai="khong_thay", ly_do="không tìm thấy đơn %s" % info["ma_don"])
     facts.update(gio_giao_du_kien=order["gio_giao_du_kien"], gio_giao_thuc_te=order["gio_giao_thuc_te"] or "chưa giao")
     if "suc_khoe" in info["van_de"]:
-        escalate_to_human(order["ma_don"], "khách báo dấu hiệu sức khoẻ sau khi ăn")
+        escalate_to_human(order["ma_don"], "Khách báo dấu hiệu sức khoẻ sau khi ăn", "suc_khoe", info["_text"], "khuyên đi khám / gọi 115")
         return "chuyen_nhan_vien", dict(facts, loai="suc_khoe", ly_do="khách báo dấu hiệu sức khoẻ — chuyển nhân viên ngay, khuyên đi khám nếu nặng")
     if order["trang_thai"] == "da_huy":
-        escalate_to_human(order["ma_don"], "đơn đã huỷ, khách đòi hoàn tiền")
+        escalate_to_human(order["ma_don"], "Đơn đã huỷ, khách đòi hoàn tiền", "da_huy", info["_text"], "báo đã chuyển nhân viên")
         return "chuyen_nhan_vien", dict(facts, loai="da_huy", ly_do="đơn đã bị huỷ — ngoài phạm vi giao trễ")
     hist = get_complaint_history(order["ma_khach"])
     if hist["so_lan_30_ngay"] >= MAX_COMPLAINTS:
-        escalate_to_human(order["ma_don"], "khách có %d khiếu nại trễ / 30 ngày" % hist["so_lan_30_ngay"])
+        escalate_to_human(order["ma_don"], "Khách có %d khiếu nại trễ / 30 ngày" % hist["so_lan_30_ngay"], "nhieu_lan", info["_text"], "báo đã chuyển nhân viên")
         return "chuyen_nhan_vien", dict(facts, loai="nhieu_lan", ly_do="đã có %d khiếu nại giao trễ trong 30 ngày — cần nhân viên xem" % hist["so_lan_30_ngay"])
     comp = compute_delay_compensation(order, get_policy("giao_tre"))
     facts.update(phut_tre=comp["phut_tre"], nguong_phut=comp["nguong"], muc_bu=comp["muc_bu"],
@@ -101,8 +102,9 @@ def _decide(info):
     facts["doi_them"] = bool(info.get("doi_them"))
     facts["yeu_cau_cam"] = bool(info.get("yeu_cau_cam"))
     if ngoai or facts["yeu_cau_cam"]:
-        escalate_to_human(order["ma_don"], "ngoài giao trễ: %s%s" % (
-            ", ".join(ngoai) or "-", " · khách có yêu cầu không được phép" if facts["yeu_cau_cam"] else ""))
+        escalate_to_human(order["ma_don"], "Ngoài giao trễ: %s%s" % (
+            ", ".join(ngoai) or "-", " · khách có yêu cầu không được phép" if facts["yeu_cau_cam"] else ""),
+            "ngoai_pham_vi", info["_text"], "đề xuất bù phần trễ, phần còn lại chuyển nhân viên")
     if comp["muc_bu"] > 0:
         draft_voucher(order["ma_don"], comp["muc_bu"], comp["ly_do"])
         return "de_xuat_voucher", facts

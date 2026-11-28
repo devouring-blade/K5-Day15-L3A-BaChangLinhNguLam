@@ -14,6 +14,7 @@ for _stream in (sys.stdout, sys.stderr):
         pass
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+os.environ["WEB_DEMO"] = "1"   # web demo: lưu ca chuyển nhân viên vào hàng chờ
 from agent import answer  # noqa: E402
 import tools  # noqa: E402
 import ai  # noqa: E402
@@ -188,8 +189,33 @@ def _vnd(x):
     return "{:,}".format(x).replace(",", ".") + "đ"
 
 
+LOAI_VI = {"suc_khoe": "Sức khoẻ sau khi ăn", "da_huy": "Đơn bị huỷ", "nhieu_lan": "Khiếu nại nhiều lần",
+           "ngoai_pham_vi": "Ngoài phạm vi (thiếu món, yêu cầu khác…)", "khac": "Khác"}
+
+
+def escalation_table(rows):
+    cas = [r for r in rows if r.get("kieu") == "chuyen_nhan_vien"]
+    cas.sort(key=lambda r: (r["trang_thai"] != "cho_nhan_vien", r["uu_tien"] != "khan", r["tao_luc"]), reverse=False)
+    if not cas:
+        return '<p>Chưa có ca nào cần nhân viên xử lý.</p>'
+    out = []
+    for r in cas:
+        khan = r["uu_tien"] == "khan" and r["trang_thai"] == "cho_nhan_vien"
+        badge = '<span class="khan">⚠ KHẨN</span>' if r["uu_tien"] == "khan" else '<span class="thuong">Thường</span>'
+        act = ('<button onclick="rv(\'%s\',\'duyet\')">Đã xử lý</button>' % r["ma_phieu"]) if r["trang_thai"] == "cho_nhan_vien" else "✔ Đã xử lý"
+        out.append('<tr class="%s"><td>%s<br><b>%s</b></td><td>%s</td><td><b>%s</b><br>%s</td><td>%s<br><small>%s</small></td>'
+                   '<td class="msg">"%s"</td><td>%s</td><td>%s</td></tr>' % (
+            "rowkhan" if khan else "", badge, r["ma_phieu"], r["tao_luc"][11:16], r["ma_don"] or "—", LOAI_VI.get(r["loai"], r["loai"]),
+            r.get("quan") or "—", ("giao " + r["gio_giao"][11:]) if r.get("gio_giao") else "",
+            _html.escape(r.get("tin_nhan", "")), r.get("tro_ly_da_noi", ""), act))
+    return ('<table id="ct"><tr><th>Ưu tiên</th><th>Lúc</th><th>Đơn · loại ca</th><th>Quán</th><th>Tin nhắn gốc của khách</th>'
+            '<th>Trợ lý đã nói</th><th>Xử lý</th></tr>%s</table>' % "".join(out))
+
+
 def admin_page():
-    rows = tools.list_complaints()
+    allrows = tools.list_complaints()
+    rows = [r for r in allrows if r.get("kieu") != "chuyen_nhan_vien"]
+    n_khan = sum(1 for r in allrows if r.get("kieu") == "chuyen_nhan_vien" and r["uu_tien"] == "khan" and r["trang_thai"] == "cho_nhan_vien")
     trs = []
     for r in reversed(rows):
         if r["trang_thai"] == "cho_nhan_vien":
@@ -201,22 +227,25 @@ def admin_page():
             r["ma_phieu"], r["tao_luc"], r["ma_don"], r["phut_tre"], _vnd(r["muc_bu"]), r["ho_ten"],
             STATUS_VI.get(r["trang_thai"], r["trang_thai"]), r["ly_do_duyet"], act))
     body = "".join(trs) or '<tr><td colspan="9">Chưa có phiếu nào.</td></tr>'
-    return ADMIN_HTML.replace("__ROWS__", body)
+    alert = ('<div class="alert">⚠ %d ca KHẨN về sức khoẻ đang chờ — xử lý trước mọi phiếu voucher</div>' % n_khan) if n_khan else ""
+    return ADMIN_HTML.replace("__ROWS__", body).replace("__CASES__", escalation_table(allrows)).replace("__ALERT__", alert)
 
 
 ADMIN_HTML = """<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Bảng khiếu nại giao trễ</title>
 <style>body{font-family:"Segoe UI",Arial,sans-serif;background:#f3f1ec;margin:0;padding:28px;color:#1d2b26}h1{margin:4px 0 6px}
 p{color:#5b665f}table{border-collapse:collapse;width:100%;background:#fff}
 th,td{padding:10px 12px;border-bottom:1px solid #e3dfd5;text-align:left;font-size:14.5px}th{background:#e9e5dc}
-button{border:0;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700;background:#1f5c4b;color:#fff}button.no{background:#e9e5dc;color:#1d2b26}</style></head>
+button{border:0;border-radius:6px;padding:6px 10px;cursor:pointer;font-weight:700;background:#1f5c4b;color:#fff}button.no{background:#e9e5dc;color:#1d2b26}h2{font-size:20px;margin:22px 0 8px}h2 small{font-size:14px;color:#5b665f;font-weight:400}.khan{background:#c92a2a;color:#fff;font-weight:800;padding:3px 8px;border-radius:6px;font-size:13px;white-space:nowrap}.thuong{background:#e9e5dc;padding:3px 8px;border-radius:6px;font-size:13px}tr.rowkhan td{background:#fff0f0}td.msg{font-style:italic;max-width:340px}.alert{background:#c92a2a;color:#fff;font-weight:700;padding:12px 16px;border-radius:10px;font-size:16px;margin:10px 0;animation:bl 1.2s infinite}@keyframes bl{50%{opacity:.75}}</style></head>
 <body><div style="font-size:14px;color:#b5452a;font-weight:700">AI20K / BaChangLinhNguLam · trang nhân viên</div><h1>Bảng khiếu nại giao trễ</h1>
 <p>Tự duyệt khi voucher ≤ 15.000đ và khách chưa khiếu nại lần nào trong 30 ngày (luật bằng code, không do AI quyết). Còn lại nhân viên duyệt ở đây. Trang tự làm mới mỗi 10 giây.</p>
-<table><tr><th>Phiếu</th><th>Tạo lúc</th><th>Đơn</th><th>Trễ</th><th>Voucher</th><th>Khách</th><th>Trạng thái</th><th>Lý do</th><th>Duyệt</th></tr>__ROWS__</table>
+__ALERT__<h2>1. Ca cần nhân viên xử lý <small>(ưu tiên trước)</small></h2>__CASES__
+<h2>2. Phiếu voucher</h2>
+<table id="vt"><tr><th>Phiếu</th><th>Tạo lúc</th><th>Đơn</th><th>Trễ</th><th>Voucher</th><th>Khách</th><th>Trạng thái</th><th>Lý do</th><th>Duyệt</th></tr>__ROWS__</table>
 <script>async function rv(id,q){await fetch('/api/review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ma_phieu:id,quyet_dinh:q})});location.reload()}
 if(new URLSearchParams(location.search).get('auto')==='1'){const b=document.createElement('div');
 b.style.cssText='position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#1d2b26;color:#fff;padding:10px 20px;border-radius:99px;font-weight:700;font-size:17px';
-b.textContent='Nhân viên duyệt phiếu chờ (voucher 30.000đ)';document.body.appendChild(b);
-setTimeout(()=>{const btn=document.querySelector('button');if(btn){btn.style.outline='4px solid #f59f00';setTimeout(()=>btn.click(),1500)}},3000);
+b.textContent='Trang nhân viên: ca KHẨN sức khoẻ nằm trên cùng · duyệt phiếu voucher 30.000đ';document.body.appendChild(b);
+setTimeout(()=>{const btn=document.querySelector('#vt button');if(btn){btn.style.outline='4px solid #f59f00';setTimeout(()=>btn.click(),1500)}},3000);
 setTimeout(()=>{b.textContent='Xong — phiếu tự duyệt và phiếu nhân viên duyệt đều đã lưu trong bảng khiếu nại'},6500)}
 else setTimeout(()=>location.reload(),10000)</script></body></html>"""
 
