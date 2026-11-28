@@ -125,5 +125,5 @@ Nhóm dùng Claude Code (Claude) để: viết code bản chạy thử (`codebas
 | 4 | Bản chạy thử làm trọn lát cắt | `codebase/` · lệnh ở mục "Lệnh" |
 | 5 | Định nghĩa "tốt" + bộ câu thử | `data/DATA_CARD.md` · `eval/` |
 | 6 | Mô phỏng chi phí khi dùng thật | `cost/` |
-| 7 | Slide + demo + video dự phòng | `demo-slides.pdf` ở thư mục gốc · link video: ____ |
+| 7 | Slide + demo + video dự phòng | `demo-slides.pdf` ở thư mục gốc · link video: https://drive.google.com/file/d/1bI2TlIAJjT2e5J4SPDD3gfy1_avVg2jc/view?usp=sharing |
 | + | *Bonus:* người dùng thử | `validation/log.md` |
