@@ -1,0 +1,10 @@
+# Reflection — Nguyễn Sỹ Huy Kiên
+
+1. **Vai trò + phần mình làm (trỏ tới file / commit):**
+   Đội trưởng, phụ trách bản chạy thử (`codebase/`). Mình tạo repo, điền `TEAMS.md`, nộp các checkpoint, lấy key OpenAI và điền `.env`, chọn cùng nhóm hướng D1 rồi chuyển sang giao trễ khi review cho thấy thiếu món gần như không có. Mình chạy script `evidence/survey/create_form.gs` để tạo Google Form khảo sát, quay video demo, và là người thứ hai kiểm 30 nhãn review (khớp 30/30) và chấm lại 5 output lượt 1 (T01, T04, T07, T10, T20 — khớp 5/5). Các lượt chạy: `eval/run-1.csv` (14/20) → `run-2.csv` → `run-3.csv` (20/20), mô phỏng chi phí `cost/simulate-1.csv`. Commit chính: `548f078` (khung luồng giao trễ), `c4130ce` (nối OpenAI), `ba7bf14` (cải tiến lượt 2–3).
+
+2. **AI hỗ trợ mình thế nào (việc gì, công cụ gì, chỗ nào phải sửa lại output AI):**
+   Mình dùng Claude Code cho phần lớn việc viết: code `agent.py`, `tools.py`, phần gọi OpenAI trong `ai.py`, nháp `spec.md`, câu thử, metric, data giả, script đếm, gắn nhãn nháp review, và chạy eval / simulate trên máy mình. Phần mình giữ: quyết định hướng đi, duyệt chuẩn "đạt", gửi khảo sát cho người thật, kiểm lại nhãn và kết quả chấm. Chỗ phải sửa: mình làm lộ API key trong một ảnh chụp màn hình nên phải thu hồi và tạo key mới; ở lượt 2, hàm kiểm số tiền do AI viết bắt nhầm mã đơn (DH1001 → "1001đ") khiến mọi câu AI viết bị loại — chỉ phát hiện được khi đọc trace, sau đó sửa và chạy thêm lượt 3. Mình phải hiểu luồng để trả lời được: AI đọc tin khách và viết câu trả lời; phút trễ, mức bù, hạn mức do code tính; voucher chỉ là bản nháp nhân viên duyệt.
+
+3. **Một câu thử trượt của nhóm và mình học được gì:**
+   T20 ở lượt 1: khách đòi "phạt quán, khoá shop" — trợ lý không hứa phạt nhưng cũng không ghi nhận phản ánh hay chuyển nhân viên, chỉ đề xuất voucher. Mình học được: chặn điều bị cấm là chưa đủ, phải cho người dùng một đường đi tiếp; lượt 2 sửa bằng cách code tự thêm "đã ghi nhận phản ánh và chuyển nhân viên" khi bước 1 phát hiện yêu cầu không được phép. Bài học thứ hai: lượt 2 đạt 20/20 nhưng toàn là câu mẫu của code — điểm đẹp không có nghĩa là hệ thống chạy đúng như thiết kế, phải xem trace.
