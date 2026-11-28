@@ -89,7 +89,8 @@ def _decide(info):
         escalate_to_human(order["ma_don"], "khách có %d khiếu nại trễ / 30 ngày" % hist["so_lan_30_ngay"])
         return "chuyen_nhan_vien", dict(facts, loai="nhieu_lan", ly_do="đã có %d khiếu nại giao trễ trong 30 ngày — cần nhân viên xem" % hist["so_lan_30_ngay"])
     comp = compute_delay_compensation(order, get_policy("giao_tre"))
-    facts.update(phut_tre=comp["phut_tre"], nguong_phut=comp["nguong"], muc_bu=comp["muc_bu"])
+    facts.update(phut_tre=comp["phut_tre"], nguong_phut=comp["nguong"], muc_bu=comp["muc_bu"],
+                 ma_khach=order["ma_khach"], so_lan_30_ngay=hist["so_lan_30_ngay"])
     ngoai = [TEN_VAN_DE.get(v, v) for v in info["van_de"] if v and v != "giao_tre"]
     if info.get("yeu_cau_cam"):            # yêu cầu bị cấm đã có câu riêng, không nhắc "yêu cầu khác" hai lần
         ngoai = [v for v in ngoai if v != TEN_VAN_DE["khac"]]
@@ -125,7 +126,7 @@ def _template(action, f):
     head = "Đơn %s dự kiến giao lúc %s, thực tế giao lúc %s" % (f["ma_don"], f["gio_giao_du_kien"][-5:], f["gio_giao_thuc_te"][-5:])
     if action == "de_xuat_voucher":
         return ("Mình xin lỗi vì đơn đến muộn. %s, tức trễ %d phút. Theo chính sách, đơn của bạn đủ điều kiện nhận voucher %s. "
-                "Mình đã gửi yêu cầu để nhân viên xác nhận, bạn sẽ nhận được thông báo khi voucher được duyệt."
+                "Bạn xác nhận thông tin để gửi yêu cầu: voucher được duyệt ngay nếu đủ điều kiện tự duyệt, nếu không nhân viên sẽ xác nhận."
                 % (head, f["phut_tre"], _vnd(f["muc_bu"])))
     tre = ("trễ %d phút" % f["phut_tre"]) if f.get("phut_tre") and f["phut_tre"] > 0 else "không bị trễ"
     return ("%s, tức %s. Chính sách chỉ bù khi đơn trễ từ %d phút, nên rất tiếc đơn này chưa đủ điều kiện nhận voucher. "
@@ -143,7 +144,7 @@ def _must_say(action, f):
         return ["Xin lỗi bạn vì đơn đến muộn.",
                 "Đơn %s dự kiến giao lúc %s, thực tế giao lúc %s, tức trễ %d phút." % (f["ma_don"], du_kien, giao, f["phut_tre"]),
                 "Theo chính sách, đơn của bạn đủ điều kiện nhận voucher %s." % _vnd(f["muc_bu"]),
-                "Mình đã gửi yêu cầu để nhân viên xác nhận; bạn sẽ nhận được thông báo khi voucher được duyệt."]
+                "Bạn xác nhận thông tin để gửi yêu cầu: voucher được duyệt ngay nếu đủ điều kiện tự duyệt, nếu không nhân viên sẽ xác nhận."]
     tre = ("trễ %d phút" % f["phut_tre"]) if f["phut_tre"] and f["phut_tre"] > 0 else "không bị trễ"
     return ["Đơn %s dự kiến giao lúc %s, thực tế giao lúc %s, tức %s." % (f["ma_don"], du_kien, giao, tre),
             "Chính sách chỉ bù khi đơn trễ từ %d phút, nên rất tiếc đơn này chưa đủ điều kiện nhận voucher." % f["nguong_phut"],
@@ -211,4 +212,8 @@ def answer(text: str) -> dict:
     if problem or reply.startswith("[câu trả lời giả"):
         note("dùng câu mẫu từ code: %s" % (problem or "model giả"))
         reply = _template(action, facts)
-    return {"output": reply + _scope_note(action, facts)}
+    # Thông tin thêm cho giao diện web (form xác nhận). Bộ chạy eval / simulate chỉ đọc "output".
+    return {"output": reply + _scope_note(action, facts), "action": action, "ma_don": facts.get("ma_don"),
+            "phut_tre": facts.get("phut_tre"), "muc_bu": facts.get("muc_bu", 0), "ma_khach": facts.get("ma_khach"),
+            "so_lan_30_ngay": facts.get("so_lan_30_ngay", 0),
+            "co_van_de_khac": bool(facts.get("ngoai_pham_vi") or facts.get("doi_them") or facts.get("yeu_cau_cam"))}

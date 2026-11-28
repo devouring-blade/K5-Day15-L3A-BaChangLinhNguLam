@@ -81,3 +81,84 @@ def escalate_to_human(ma_don: str, tom_tat: str) -> dict:
     """escalate_to_human · input: mã đơn (có thể rỗng), tóm tắt · output: ca chờ nhân viên
     · có tác động ra ngoài (tạo ca) — đảo được, nhân viên đóng ca. Ở bản chạy thử chỉ trả ca giả."""
     return {"ma_don": ma_don, "tom_tat": tom_tat, "trang_thai": "cho_nhan_vien"}
+
+
+# ---- Bảng khiếu nại + duyệt (thêm sau CP4) ----------------------------------------
+# Lưu ở data/runtime/khieu_nai.json — dữ liệu lúc chạy, KHÔNG commit (đã thêm vào .gitignore).
+import json as _json
+import threading as _threading
+
+AUTO_APPROVE_MAX = 15000          # tự duyệt khi mức bù ≤ 15.000đ …
+AUTO_APPROVE_MAX_HISTORY = 0      # … và khách chưa khiếu nại giao trễ lần nào trong 30 ngày
+_RUNTIME = os.path.join(DATA, "runtime", "khieu_nai.json")
+_LOCK = _threading.Lock()
+
+
+def _load():
+    if not os.path.exists(_RUNTIME):
+        return []
+    with open(_RUNTIME, encoding="utf-8") as f:
+        return _json.load(f)
+
+
+def _save(rows):
+    os.makedirs(os.path.dirname(_RUNTIME), exist_ok=True)
+    with open(_RUNTIME, "w", encoding="utf-8") as f:
+        _json.dump(rows, f, ensure_ascii=False, indent=2)
+
+
+@tool
+def check_auto_approve(muc_bu: int, so_lan_30_ngay: int, co_van_de_khac: bool) -> dict:
+    """check_auto_approve · input: mức bù code đã tính, số lần khiếu nại 30 ngày, có vấn đề ngoài phạm vi / đòi thêm không
+    · output: {"tu_duyet": bool, "ly_do": str} — LUẬT CỨNG BẰNG CODE, AI không quyết · không tác động ra ngoài."""
+    if muc_bu <= 0:
+        return {"tu_duyet": False, "ly_do": "không có mức bù"}
+    if muc_bu > AUTO_APPROVE_MAX:
+        return {"tu_duyet": False, "ly_do": "mức bù trên %sđ cần nhân viên duyệt" % "{:,}".format(AUTO_APPROVE_MAX).replace(",", ".")}
+    if so_lan_30_ngay > AUTO_APPROVE_MAX_HISTORY:
+        return {"tu_duyet": False, "ly_do": "khách đã khiếu nại trong 30 ngày, cần nhân viên duyệt"}
+    if co_van_de_khac:
+        return {"tu_duyet": False, "ly_do": "có yêu cầu ngoài phạm vi / đòi thêm, cần nhân viên duyệt"}
+    return {"tu_duyet": True, "ly_do": "mức bù nhỏ, khách chưa khiếu nại lần nào trong 30 ngày"}
+
+
+@tool
+def save_complaint(ma_don: str, ma_khach: str, phut_tre: int, muc_bu: int, ho_ten: str, sdt: str,
+                   tu_duyet: bool, ly_do_duyet: str) -> dict:
+    """save_complaint · input: thông tin đơn (code tính) + thông tin khách xác nhận · output: phiếu khiếu nại
+    · CÓ tác động: ghi vào bảng khiếu nại (data/runtime/khieu_nai.json). Mỗi đơn chỉ một phiếu.
+    Tự duyệt chỉ khi check_auto_approve cho phép; còn lại trạng thái "cho_nhan_vien"."""
+    with _LOCK:
+        rows = _load()
+        for r in rows:
+            if r["ma_don"] == ma_don:
+                return dict(r, trung=True)
+        rec = {"ma_phieu": "KN%04d" % (len(rows) + 1), "ma_don": ma_don, "ma_khach": ma_khach,
+               "phut_tre": phut_tre, "muc_bu": muc_bu, "ho_ten": ho_ten, "sdt": sdt,
+               "trang_thai": "da_duyet_tu_dong" if tu_duyet else "cho_nhan_vien",
+               "ly_do_duyet": ly_do_duyet, "tao_luc": datetime.now().strftime(TIME_FMT), "nguoi_duyet": "he_thong" if tu_duyet else ""}
+        rows.append(rec)
+        _save(rows)
+        return rec
+
+
+@tool
+def list_complaints() -> list:
+    """list_complaints · input: không · output: mọi phiếu khiếu nại · không tác động ra ngoài."""
+    return _load()
+
+
+@tool
+def review_complaint(ma_phieu: str, quyet_dinh: str, nguoi_duyet: str = "nhan_vien") -> dict:
+    """review_complaint · input: mã phiếu, quyết định ("duyet" | "tu_choi") · output: phiếu đã cập nhật
+    · CÓ tác động: NHÂN VIÊN duyệt / từ chối phiếu đang chờ (không dành cho AI)."""
+    with _LOCK:
+        rows = _load()
+        for r in rows:
+            if r["ma_phieu"] == ma_phieu and r["trang_thai"] == "cho_nhan_vien":
+                r["trang_thai"] = "da_duyet" if quyet_dinh == "duyet" else "tu_choi"
+                r["nguoi_duyet"] = nguoi_duyet
+                r["duyet_luc"] = datetime.now().strftime(TIME_FMT)
+                _save(rows)
+                return r
+    return {"loi": "không tìm thấy phiếu đang chờ %s" % ma_phieu}
