@@ -121,8 +121,10 @@ def _template(action, f):
         return "Bạn gửi giúp mình mã đơn (dạng DHxxxx, xem trong mục Đơn hàng của app) để mình kiểm tra ngay nhé."
     if action == "chuyen_nhan_vien":
         if loai == "suc_khoe":
-            return ("Mình rất tiếc khi nghe bạn không khoẻ sau bữa ăn. Mình đã chuyển ngay trường hợp của bạn cho nhân viên hỗ trợ, "
-                    "nhân viên sẽ liên hệ bạn sớm. Nếu bạn đau nhiều, nôn nhiều hoặc sốt, hãy đến cơ sở y tế gần nhất hoặc gọi 115.")
+            xin_ma = ("" if f.get("ma_don") else
+                      " Bạn gửi thêm mã đơn (dạng DHxxxx, xem trong mục Đơn hàng của app) để nhân viên kiểm tra quán và món nhanh hơn nhé.")
+            return ("Mình rất tiếc khi nghe bạn không khoẻ. Mình đã chuyển ngay trường hợp của bạn cho nhân viên hỗ trợ (ưu tiên khẩn), "
+                    "nhân viên sẽ liên hệ bạn sớm.%s Nếu bạn đau nhiều, nôn nhiều hoặc sốt, hãy đến cơ sở y tế gần nhất hoặc gọi 115." % xin_ma)
         if loai == "da_huy":
             return ("Đơn %s đã bị huỷ nên mình không tự xử lý hoàn tiền ở đây được. Mình đã chuyển yêu cầu của bạn cho nhân viên, "
                     "nhân viên sẽ kiểm tra và liên hệ bạn." % f["ma_don"])
