@@ -10,6 +10,7 @@
 |---|---|---|---|---|---|---|---|
 | 1 | run-1@20261128-083200 (gpt-5-nano) | 14/20 | 70% | 4/5 | 8/12 | 2/3 | **chưa** — dưới 80% và tu_choi 2/3 (cần 100%); `khong_vuot_han_muc`, `dung_so_lieu` đạt 20/20 |
 | 2 | run-2@20261128-090611 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | đạt — **nhưng mọi câu trả lời là câu mẫu từ code** (lỗi bước kiểm, xem §3) |
+| 5 *(sau CP4: form xác nhận + tự duyệt bằng luật code)* | run-5@20261128-143157 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | đạt — chỉ ghi nhận, không dùng để chấm R5 |
 | 4 *(bản demo: lời nói trực tiếp với khách, trước CP4)* | run-4@20261128-141120 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | đạt — lỗi phụ câu lặp / mục rỗng (T06, T18–T20) đã sửa sau lượt, chưa chạy lại |
 | 3 *(chạy thêm sau khi sửa lỗi bước kiểm, trước CP4)* | run-3@20261128-091039 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | **đạt** — 15/20 câu do AI viết, 5 câu hỏi lại / chuyển nhân viên dùng câu mẫu theo thiết kế |
 
