@@ -95,6 +95,69 @@ document.getElementById('reset').onclick=hello;hello();
 </script></body></html>"""
 
 
+import csv as _csv
+import html as _html
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Chỉ những file này được mở để xem (không mở file tuỳ ý)
+DATASETS = {
+    "cau-thu":    ("Bộ 20 câu thử", "eval/benchmark.csv", "Câu khách nhắn, kết quả đúng, tiêu chí đạt, loại câu, nguồn."),
+    "luot-1":     ("Kết quả lượt 1 (14/20)", "eval/run-1.csv", "Output thật của model, cột pass (1 = đạt), ghi chú vì sao."),
+    "luot-3":     ("Kết quả lượt 3 (20/20)", "eval/run-3.csv", "Sau cải tiến và sửa lỗi bước kiểm."),
+    "luot-5":     ("Kết quả lượt 5 (20/20, bản cuối)", "eval/run-5.csv", "Bản có form xác nhận + tự duyệt."),
+    "review":     ("150 review ShopeeFood (Google Play)", "evidence/reviews-shopeefood.csv", "Mỗi review: ngày, số sao, trích ngắn, nhãn. Không có tên người viết."),
+    "khao-sat":   ("Khảo sát — 23 phiếu", "evidence/survey/results.csv", "Câu trả lời thật, ẩn danh."),
+    "don-hang":   ("12 đơn hàng mẫu (dữ liệu giả)", "data/don_hang.csv", "Dùng cho bản chạy thử và bộ câu thử."),
+    "chinh-sach": ("Chính sách bù giao trễ (tự đặt)", "data/chinh_sach.csv", "Bậc bù theo phút trễ, hạn mức."),
+    "lich-su":    ("Lịch sử khiếu nại (dữ liệu giả)", "data/lich_su_khieu_nai.csv", "Số lần khiếu nại giao trễ trong 30 ngày."),
+    "chi-phi":    ("Mô phỏng chi phí — 50 phiên", "cost/simulate-1.csv", "Token đo thật từng phiên."),
+}
+HIDE_COLS = {"run_id", "model", "model_calls", "tool_calls", "tokens_in", "tokens_out", "latency_s", "error",
+             "expected", "pass_criterion"}
+
+
+def view_page(key):
+    if key not in DATASETS:
+        links = "".join('<li><a href="/xem/%s">%s</a> — %s</li>' % (k, t, d) for k, (t, _, d) in DATASETS.items())
+        return VIEW_HTML.replace("__TITLE__", "Dữ liệu của nhóm").replace("__DESC__", "Chọn một bộ dữ liệu.") \
+            .replace("__BODY__", "<ul class='list'>%s</ul>" % links).replace("__COUNT__", "")
+    title, rel, desc = DATASETS[key]
+    with open(os.path.join(ROOT_DIR, rel), encoding="utf-8-sig") as f:
+        rows = list(_csv.reader(f))
+    head, data = rows[0], rows[1:]
+    keep = [i for i, h in enumerate(head) if not (key.startswith("luot") and h in HIDE_COLS)]
+    th = "".join("<th>%s</th>" % _html.escape(head[i]) for i in keep)
+    trs = []
+    for r in data:
+        cells = []
+        for i in keep:
+            v = r[i] if i < len(r) else ""
+            cls = ""
+            if head[i] == "pass":
+                cls, v = ("ok", "✔ đạt") if v == "1" else (("no", "✘ trượt") if v == "0" else ("", v))
+            cells.append('<td class="%s">%s</td>' % (cls, _html.escape(v)))
+        trs.append("<tr>%s</tr>" % "".join(cells))
+    body = "<table id='t'><thead><tr>%s</tr></thead><tbody>%s</tbody></table>" % (th, "".join(trs))
+    return VIEW_HTML.replace("__TITLE__", _html.escape(title)).replace("__DESC__", _html.escape(desc) + " · File: <code>%s</code>" % rel) \
+        .replace("__BODY__", body).replace("__COUNT__", "%d dòng" % len(data))
+
+
+VIEW_HTML = """<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>__TITLE__</title>
+<style>body{font-family:"Segoe UI",Arial,sans-serif;background:#f3f1ec;margin:0;padding:24px 28px;color:#1d2b26}
+.k{font-size:14px;color:#b5452a;font-weight:700}h1{margin:4px 0}p{color:#5b665f;margin:4px 0 12px}
+.bar{display:flex;gap:12px;align-items:center;margin-bottom:12px}input{flex:0 0 340px;padding:9px 12px;border:1px solid #d8d4ca;border-radius:8px;font:inherit}
+table{border-collapse:collapse;width:100%;background:#fff}th,td{padding:8px 10px;border-bottom:1px solid #ece8df;text-align:left;font-size:14px;vertical-align:top}
+th{background:#e9e5dc;position:sticky;top:0}tr:hover td{background:#faf8f3}.ok{color:#2b8a3e;font-weight:700}.no{color:#c92a2a;font-weight:700}
+.list li{margin:8px 0;font-size:16px}a{color:#1f5c4b;font-weight:700}</style></head><body>
+<div class="k">AI20K / BaChangLinhNguLam · <a href="/xem">tất cả dữ liệu</a> · <a href="/trinh-bay">slide</a> · <a href="/">trợ lý</a></div>
+<h1>__TITLE__</h1><p>__DESC__</p>
+<div class="bar"><input id="f" placeholder="Lọc nhanh: gõ mã câu, nhãn, từ khoá…" oninput="flt()"><span id="c">__COUNT__</span></div>
+__BODY__
+<script>function flt(){const q=document.getElementById('f').value.toLowerCase();let n=0;
+document.querySelectorAll('#t tbody tr').forEach(r=>{const v=r.textContent.toLowerCase().includes(q);r.style.display=v?'':'none';if(v)n++});
+const c=document.getElementById('c');if(document.getElementById('t'))c.textContent=n+' dòng'}</script></body></html>"""
+
+
 STATUS_VI = {"da_duyet_tu_dong": "Đã duyệt tự động", "cho_nhan_vien": "Chờ nhân viên duyệt",
              "da_duyet": "Nhân viên đã duyệt", "tu_choi": "Nhân viên từ chối"}
 
@@ -162,6 +225,12 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_GET(self):
+        if self.path.startswith("/xem"):
+            key = self.path[len("/xem"):].strip("/").split("?")[0]
+            return self._send(200, view_page(key), "text/html")
+        if self.path.startswith("/trinh-bay"):
+            with open(os.path.join(ROOT_DIR, "slides", "trinh-bay.html"), encoding="utf-8") as f:
+                return self._send(200, f.read(), "text/html")
         if self.path.startswith("/admin"):
             return self._send(200, admin_page(), "text/html")
         if self.path in ("/", "/index.html"):
