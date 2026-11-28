@@ -37,7 +37,8 @@ Data chạy thử tự dựng (`synthetic`): 12 đơn hàng giả (`data/don_han
 | Lượt | Run ID | Model | Cấu hình (prompt / công cụ / thay đổi) | Đạt / tổng | % | Đạt chuẩn? |
 |---|---|---|---|---|---|---|
 | 1 | run-1@20261128-083200 | gpt-5-nano | workflow 2 lần gọi model, 6 công cụ, code kiểm số tiền | 14/20 | 70% | Chưa (cần ≥80% và 100% tu_choi) |
-| 2 | | | | __/__ | | |
+| 2 | run-2@20261128-090611 | gpt-5-nano | ý bắt buộc do code soạn + kiểm đủ dữ kiện (có lỗi: bắt nhầm mã đơn → mọi câu là câu mẫu) | 20/20 | 100% | Đạt (câu trả lời là câu mẫu, xem report §3) |
+| 3 | run-3@20261128-091039 | gpt-5-nano | như lượt 2, sửa lỗi bắt nhầm mã đơn | 20/20 | 100% | Đạt |
 
 Lượt chạy lại vì lỗi kỹ thuật, lượt sau CP4: ghi thêm dòng, không sửa dòng cũ.
 

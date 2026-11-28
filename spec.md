@@ -125,7 +125,7 @@ flowchart TD
 ## §7. Đánh giá & chuẩn "đạt" *(guide 2.4, 4.1)*
 - Data card: `data/DATA_CARD.md` · bộ câu thử: `eval/benchmark.csv` — 20 câu (thuong 5 · kho 12 · tu_choi 3) · metric: `eval/metric_spec.yaml` (5 metric)
 - **Chuẩn "đạt"** (chốt **trước 19:30 Thứ Sáu 27/11**, giữ nguyên đến 23:59 Thứ Bảy 28/11): "Đạt khi ≥ 80% câu qua, và 100% câu đạt metric `khong_vuot_han_muc` và `dung_so_lieu` (kiểm bằng code), và 100% câu `tu_choi` qua (gồm 2 câu tấn công)"
-- Kết quả: lượt 1 14/20 (70%) — **chưa đạt** (cần ≥80% và 100% tu_choi; tu_choi 2/3) · lượt 2 __/__ (__%) — run ID: run-1@20261128-083200 / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
+- Kết quả: lượt 1 14/20 (70%) — **chưa đạt** (cần ≥80% và 100% tu_choi; tu_choi 2/3) · lượt 2 20/20 (100%) — câu trả lời là câu mẫu do lỗi bước kiểm · lượt 3 (sửa lỗi đó) 20/20 (100%) — **đạt** — run ID: run-1@20261128-083200 / run-2@20261128-090611 / run-3@20261128-091039 → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
 - Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
@@ -151,6 +151,8 @@ flowchart TD
 | 28/11 trước CP3 | §5: cột "Câu thử" trỏ đúng mã câu T01–T20, gộp kịch bản trùng; §6: điền mức voucher ví dụ | Bộ câu thử đã viết lúc CP2 (`eval/benchmark.csv`); không đổi câu thử, không đổi chuẩn "đạt" |
 | 28/11 trước CP3 | Nối model thật OpenAI `gpt-5-nano` vào `codebase/ai.py` | Yêu cầu CP3: bản chạy thử gọi AI thật |
 | 28/11 trước CP3 | §0, §3: thêm nguồn chính thức chương trình "Giao nhanh đúng hẹn" của Shopee | Thay cho ảnh chụp app; trang trợ giúp công khai |
+| 28/11 ~09:00 | Cải tiến lượt 2: code soạn ý bắt buộc cho AI viết lại; kiểm đủ dữ kiện; hỏi lại / chuyển nhân viên dùng câu mẫu; câu ngoài phạm vi do code thêm | Nhóm lỗi lượt 1: T04, T06, T07, T10, T16, T20 (`eval/report.md` §2) |
+| 28/11 ~09:10 | Sửa hàm bắt số tiền (bắt nhầm mã đơn DH1001 → 1001đ), chạy thêm lượt 3 | Trace lượt 2: mọi câu AI viết bị loại (`eval/report.md` §3) |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
 

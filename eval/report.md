@@ -9,9 +9,10 @@
 | Lượt | Run ID | Đạt / tổng | % | thuong | kho | tu_choi | So với chuẩn "đạt" |
 |---|---|---|---|---|---|---|---|
 | 1 | run-1@20261128-083200 (gpt-5-nano) | 14/20 | 70% | 4/5 | 8/12 | 2/3 | **chưa** — dưới 80% và tu_choi 2/3 (cần 100%); `khong_vuot_han_muc`, `dung_so_lieu` đạt 20/20 |
-| 2 | | __/__ | | __/__ | __/__ | __/__ | đạt / chưa |
+| 2 | run-2@20261128-090611 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | đạt — **nhưng mọi câu trả lời là câu mẫu từ code** (lỗi bước kiểm, xem §3) |
+| 3 *(chạy thêm sau khi sửa lỗi bước kiểm, trước CP4)* | run-3@20261128-091039 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | **đạt** — 15/20 câu do AI viết, 5 câu hỏi lại / chuyển nhân viên dùng câu mẫu theo thiết kế |
 
-Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-1.jsonl`, `traces/run-2.jsonl`.
+Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`, `eval/run-3.csv`. Trace: `traces/run-1.jsonl`, `traces/run-2.jsonl`, `traces/run-3.jsonl`. Cột `pass` do Claude chấm nháp (lý do ở `ghi_chu`); lượt 1 có người thứ hai chấm lại 5 câu, khớp 5/5.
 
 ## 2. Lỗi lượt 1 — gom thành nhóm có tên
 
@@ -36,12 +37,17 @@ Nguyên nhân chung: bước 2 (AI viết câu trả lời) được đưa nguy�
 
 ## 3. Một lần cải tiến
 
-- Nhắm vào nhóm lỗi: __ — vì sao là nhóm **đau nhất với người dùng**: __
-- Đã sửa gì (có thể vài thay đổi cùng nhắm nhóm lỗi đó): __
-- Kết quả: nhóm lỗi đó __/__ → __/__ · tổng __% → __%
-- Câu nào **tệ đi** sau khi sửa: __
+- Nhắm vào nhóm lỗi: **câu trả lời không khớp quyết định của code** — thiếu dữ kiện (T04, T06), nói gây hiểu sai về voucher / sai lý do (T07, T16), không làm trọn hướng xử lý (T10, T20) — vì sao là nhóm **đau nhất với người dùng**: pain chính là khách "không biết có được bù gì" (13/16 lần trễ không được bù / không khiếu nại, `evidence/summary.md`); nói thiếu hoặc nói sai mức bù làm hỏng đúng chỗ đó.
+- Đã sửa gì (`codebase/agent.py`):
+  1. Code soạn sẵn **ý bắt buộc** (số phút trễ, ngưỡng, mức bù, lý do "phần trễ X phút") — AI chỉ viết lại cho tự nhiên, không nhận JSON thô nữa.
+  2. Bước kiểm bằng code thêm: đủ dữ kiện bắt buộc theo hành động; không nhắc voucher khi chưa đủ điều kiện / chưa có đơn; bắt cả số tiền viết liền ("15000", "15k").
+  3. Hỏi lại / chuyển nhân viên dùng câu mẫu của code (không cần AI viết, tránh nói sai).
+  4. Câu về phần ngoài phạm vi do code thêm, chỉ khi thật sự có; yêu cầu bị cấm (phạt quán, xin số điện thoại…) → ghi nhận phản ánh + chuyển nhân viên. Prompt bước 1 thêm định nghĩa `doi_them`, `yeu_cau_cam`.
+- Kết quả: nhóm lỗi đó 0/6 → 6/6 · tổng 70% → 100% (lượt 2) → 100% (lượt 3).
+- **Lượt 2 có lỗi của chính bước kiểm:** hàm bắt số tiền bắt nhầm mã đơn (DH**1001** → "1001 đồng"), nên **mọi câu AI viết bị loại**, 20/20 câu lượt 2 là câu mẫu từ code (trace: "số tiền [1001] không khớp mức code tính"). Kết quả lượt 2 đúng với tiêu chí nhưng không đo được câu AI viết. Đã sửa (bỏ số dính chữ) và **chạy thêm lượt 3** trước CP4: 15/20 câu do AI viết, vẫn 20/20.
+- Câu nào **tệ đi** sau khi sửa: không câu nào trượt; nhưng câu AI viết ở lượt 3 gần như chép nguyên ý bắt buộc (cứng, có chỗ xưng "khách" thay vì "bạn", T02 giữ gạch đầu dòng) — đổi lại độ chính xác.
 
 ## 4. Còn lại
 
-- Lỗi chưa sửa + nguy hiểm thế nào: __
-- Nếu có thêm 1 tuần: __
+- Lỗi chưa sửa + nguy hiểm thế nào: bước 1 đôi khi gắn nhầm "đòi thêm" → câu thừa "nếu muốn mức bù cao hơn…" ngay cả khi không có bù (T06, T11) — không sai tiền nhưng gây khó hiểu; câu mẫu chuyển nhân viên cho ca sức khoẻ (T15) đọc như ghi chú nội bộ — ca nguy hiểm nhất cần lời khuyên rõ hơn; bộ câu thử chỉ 20 câu, 20/20 có thể là do câu thử còn dễ với luồng có code kiểm.
+- Nếu có thêm 1 tuần: thêm câu thử mới chưa từng thấy (nhiều đơn trong một tin, tiếng lóng, không dấu) để đo lại; viết lại câu mẫu ca sức khoẻ; đo tỉ lệ AI gắn nhầm `doi_them`; thử chính sách thật nếu app công bố.
