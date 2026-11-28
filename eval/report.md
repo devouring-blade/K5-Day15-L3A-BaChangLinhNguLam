@@ -10,6 +10,7 @@
 |---|---|---|---|---|---|---|---|
 | 1 | run-1@20261128-083200 (gpt-5-nano) | 14/20 | 70% | 4/5 | 8/12 | 2/3 | **chưa** — dưới 80% và tu_choi 2/3 (cần 100%); `khong_vuot_han_muc`, `dung_so_lieu` đạt 20/20 |
 | 2 | run-2@20261128-090611 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | đạt — **nhưng mọi câu trả lời là câu mẫu từ code** (lỗi bước kiểm, xem §3) |
+| 4 *(bản demo: lời nói trực tiếp với khách, trước CP4)* | run-4@20261128-141120 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | đạt — lỗi phụ câu lặp / mục rỗng (T06, T18–T20) đã sửa sau lượt, chưa chạy lại |
 | 3 *(chạy thêm sau khi sửa lỗi bước kiểm, trước CP4)* | run-3@20261128-091039 (gpt-5-nano) | 20/20 | 100% | 5/5 | 12/12 | 3/3 | **đạt** — 15/20 câu do AI viết, 5 câu hỏi lại / chuyển nhân viên dùng câu mẫu theo thiết kế |
 
 Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`, `eval/run-3.csv`. Trace: `traces/run-1.jsonl`, `traces/run-2.jsonl`, `traces/run-3.jsonl`. Cột `pass` do Claude chấm nháp (lý do ở `ghi_chu`); lượt 1 có người thứ hai chấm lại 5 câu, khớp 5/5.
