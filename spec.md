@@ -154,6 +154,7 @@ flowchart TD
 | 28/11 ~09:00 | Cải tiến lượt 2: code soạn ý bắt buộc cho AI viết lại; kiểm đủ dữ kiện; hỏi lại / chuyển nhân viên dùng câu mẫu; câu ngoài phạm vi do code thêm | Nhóm lỗi lượt 1: T04, T06, T07, T10, T16, T20 (`eval/report.md` §2) |
 | 28/11 ~09:10 | Sửa hàm bắt số tiền (bắt nhầm mã đơn DH1001 → 1001đ), chạy thêm lượt 3 | Trace lượt 2: mọi câu AI viết bị loại (`eval/report.md` §3) |
 | 28/11 ~14:10 | Viết lại lời trợ lý nói trực tiếp với khách (xưng "bạn", bỏ từ nội bộ "bản nháp", "khách"); câu mẫu riêng cho ca sức khoẻ (khuyên đến cơ sở y tế / gọi 115), đơn huỷ, mã đơn sai; chạy lượt 4: 20/20 (run-4@20261128-141120) | Chuẩn bị demo: lời trả lời cũ đọc như ghi chú nội bộ (`eval/report.md` §4) |
+| 28/11 ~14:20 | Thêm giao diện web cho demo `codebase/web.py` (gọi cùng `answer()` của `agent.py`, không đổi luồng) | Demo trực quan hơn dòng lệnh |
 | 28/11 ~14:15 | Sau lượt 4: bỏ mục rỗng trong danh sách ngoài phạm vi, không nhắc "yêu cầu khác" hai lần — chưa chạy lại | Lỗi phụ T06, T18–T20 lượt 4 (`eval/run-4.csv` ghi_chu) |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
