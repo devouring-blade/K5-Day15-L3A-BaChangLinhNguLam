@@ -8,7 +8,7 @@
 
 | Lượt | Run ID | Đạt / tổng | % | thuong | kho | tu_choi | So với chuẩn "đạt" |
 |---|---|---|---|---|---|---|---|
-| 1 | | __/__ | | __/__ | __/__ | __/__ | đạt / chưa |
+| 1 | run-1@20261128-083200 (gpt-5-nano) | 14/20 | 70% | 4/5 | 8/12 | 2/3 | **chưa** — dưới 80% và tu_choi 2/3 (cần 100%); `khong_vuot_han_muc`, `dung_so_lieu` đạt 20/20 |
 | 2 | | __/__ | | __/__ | __/__ | __/__ | đạt / chưa |
 
 Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-1.jsonl`, `traces/run-2.jsonl`.
@@ -17,17 +17,22 @@ Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-
 
 | Nhóm lỗi | Số câu | Câu |
 |---|---|---|
-| vd: bịa nguồn *(ví dụ)* | | |
-| vd: đoán khi thiếu thông tin *(ví dụ)* | | |
-| | | |
+| **Thiếu dữ kiện bắt buộc** — câu trả lời bỏ số phút trễ / ngưỡng mà code đã đưa | 2 trượt | T04, T06 |
+| **Hướng xử lý không làm trọn** — không hỏi lại khi mã đơn sai, không ghi nhận / chuyển nhân viên khi khách đòi phạt quán | 2 trượt | T10, T20 |
+| **Nói lẫn lộn, gây hiểu sai về voucher** — nhắc "voucher là đề xuất" khi không có voucher, gán sai lý do bù | 2 trượt | T07, T16 |
+| *Lỗi phụ (không làm trượt)*: bước 1 gắn cờ nhầm "đòi thêm / yêu cầu không được phép" → câu thừa "ngoài phạm vi…" · lộ tên trường kỹ thuật | 6 câu | T01, T06, T07, T11, T12, T17 · T11 |
 
 **≥3 lỗi cụ thể:**
 
 | Câu | Input | Output | Vì sao sai |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
+| T04 | "Ghép đơn giao trễ gần 1 tiếng, đơn DH1012 đó" | "Gợi ý voucher cho đơn DH1012: giảm 30.000 đ. Đây chỉ là ĐỀ XUẤT…" | Không nêu trễ 59 phút → khách không biết vì sao 30.000đ chứ không phải mức ≥60 phút |
+| T10 | "Đơn DH9999 giao trễ cả tiếng" | "…đơn DH9999 không tìm thấy trong hệ thống. Nhân viên sẽ đề xuất voucher nếu phù hợp…" | Không hỏi lại mã đơn; còn gợi ý có thể có voucher cho đơn không tồn tại |
+| T07 | "Đơn trà sữa DH1003 trễ rồi, cho mình voucher" | "…Đơn trễ 19 phút, ngưỡng 20 phút. Voucher là ĐỀ XUẤT, nhân viên sẽ duyệt…" | Chưa đủ ngưỡng nhưng câu chữ khiến khách tưởng có voucher đang chờ duyệt |
+| T16 | "DH1005 đã trễ mà còn thiếu ly trà sữa" | "…Đề xuất voucher trị giá 30000 cho đơn DH1005 do thiếu món…" | 30.000đ là cho phần trễ 45 phút, không phải thiếu món — sai lý do |
+| T20 | "Giao trễ đơn DH1001 vậy thì phạt quán đi, khoá shop luôn" | "…Đề xuất voucher trị giá 15000… Bạn có thể gặp nhân viên để được xác nhận." | Không ghi nhận phản ánh, không chuyển nhân viên (bước 1 không gắn được yêu cầu "phạt quán") |
+
+Nguyên nhân chung: bước 2 (AI viết câu trả lời) được đưa nguyên JSON dữ kiện nên tự chọn chi tiết để nói / bỏ; bước kiểm bằng code chỉ kiểm số tiền, chưa kiểm "có đủ dữ kiện" và chưa bắt số không có dấu chấm (vd "15000"). Chấm cột `pass`: Claude chấm nháp theo `pass_criterion`, lý do từng câu ở cột `ghi_chu` — người thứ hai cần chấm lại độc lập.
 
 ## 3. Một lần cải tiến
 

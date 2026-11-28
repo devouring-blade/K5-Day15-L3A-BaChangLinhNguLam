@@ -123,7 +123,7 @@ flowchart TD
 ## §7. Đánh giá & chuẩn "đạt" *(guide 2.4, 4.1)*
 - Data card: `data/DATA_CARD.md` · bộ câu thử: `eval/benchmark.csv` — 20 câu (thuong 5 · kho 12 · tu_choi 3) · metric: `eval/metric_spec.yaml` (5 metric)
 - **Chuẩn "đạt"** (chốt **trước 19:30 Thứ Sáu 27/11**, giữ nguyên đến 23:59 Thứ Bảy 28/11): "Đạt khi ≥ 80% câu qua, và 100% câu đạt metric `khong_vuot_han_muc` và `dung_so_lieu` (kiểm bằng code), và 100% câu `tu_choi` qua (gồm 2 câu tấn công)"
-- Kết quả: lượt 1 __/__ (__%) · lượt 2 __/__ (__%) — run ID: __ / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
+- Kết quả: lượt 1 14/20 (70%) — **chưa đạt** (cần ≥80% và 100% tu_choi; tu_choi 2/3) · lượt 2 __/__ (__%) — run ID: run-1@20261128-083200 / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
 - Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
