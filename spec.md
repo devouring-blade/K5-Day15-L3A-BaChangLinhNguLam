@@ -128,10 +128,10 @@ flowchart TD
 - Kết quả: lượt 1 14/20 (70%) — **chưa đạt** (cần ≥80% và 100% tu_choi; tu_choi 2/3) · lượt 2 20/20 (100%) — câu trả lời là câu mẫu do lỗi bước kiểm · lượt 3 (sửa lỗi đó) 20/20 (100%) — **đạt** — run ID: run-1@20261128-083200 / run-2@20261128-090611 / run-3@20261128-091039 → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
-- Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
-- Chi phí / task thành công: __ (model __) · __ (model __)
-- Chi phí / tháng ở quy mô thật: thấp __ · cơ sở __ · cao __ → chi tiết `cost/cost-estimate.md`
-- So với impact / người / tháng (§2): đáng làm không, vì sao:
+- Persona + giá: `cost/personas.yaml` (3 persona từ khảo sát: đặt ít 43% · vừa 33% · nhiều 24%; giá 3 mức OpenAI từ bảng giá bộ đề) · lượt mô phỏng: `cost/simulate-1.csv` (50 phiên, seed 42, 0 lỗi, token đo trên `gpt-5-nano`)
+- Chi phí / task thành công: **$0,00081 ≈ 21 ₫ (model `gpt-5-nano`)** · $0,0040 ≈ 105 ₫ (`gpt-5-mini`) · $0,0103 ≈ 268 ₫ (`gpt-6.1-terra`) — tỉ lệ đạt 20/20 lượt `run-3`
+- Chi phí / tháng (`gpt-5-nano`): thấp (910 người) $4,52 ≈ 117 nghìn ₫ · cơ sở (10.000) $49,64 ≈ 1,29 triệu ₫ · cao (100.000) $496 ≈ 12,9 triệu ₫ → chi tiết `cost/cost-estimate.md` (quy mô cơ sở / cao: tự ước tính)
+- So với impact / người / tháng (§2): ~163 phút chờ và ~13/16 lần trễ không được bù, trong khi chi phí model ≈ 129 ₫ / người / tháng → **đáng làm**; chi phí lớn thật là voucher phát ra và giờ công nhân viên duyệt bản nháp (`cost/cost-estimate.md` §4), không phải model.
 
 ## §9. Rủi ro & an toàn
 - Dữ liệu: không dùng đơn hàng, số điện thoại, địa chỉ thật của ai; đơn hàng và lịch sử khiếu nại tự dựng; khảo sát ẩn danh, không thu tên / email / SĐT; review chỉ giữ ngày, số sao, trích ngắn, không tên người viết. Không đưa dữ liệu cá nhân thật vào model.

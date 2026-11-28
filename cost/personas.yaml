@@ -1,52 +1,49 @@
 # Mô phỏng chi phí khi dùng thật — điền ở guide bước 4.2.
-# Ôn lại: ngày 13, ngày 1, ngày 14 · lab ngày 13, lab ngày 14.
-# Mọi số phải có nguồn (data / phỏng vấn / khảo sát / quy mô khoá có nguồn) hoặc ghi rõ "(tự ước tính)".
-# Chạy: python run.py simulate --try   (10 phiên, kiểm khung — làm trước CP3)
-#       python run.py simulate         (đủ số phiên dưới đây — bản nộp CP4)
-# Thay mọi dòng "(ví dụ)" bằng số và nguồn của nhóm; simulate nhắc nếu còn sót.
+# Mọi số có nguồn (khảo sát / quy mô khoá có nguồn) hoặc ghi rõ "(tự ước tính)".
+# Chạy: python run.py simulate --rate-from eval/run-3.csv
+# Một "phiên" = một lần khách mở trợ lý để khiếu nại một đơn giao trễ.
 
 sessions: 50        # số phiên mô phỏng — bản nộp ≥50
 seed: 42            # giữ cố định để chạy lại ra cùng chuỗi phiên
 
-users:              # số người dùng thật nếu đưa vào dùng — 3 kịch bản, ở quy mô thật của sản phẩm
-                    # track A: khoá học · track B–F: người dùng của sản phẩm / nhóm nhắm tới, nguồn công khai có link
-  low: 300
-  base: 700
-  high: 1000
-  source: "(ví dụ) track A — thay bằng số của nhóm. Cơ sở: lớp L3 hơn 700 học viên (README hackathon); thấp, cao: (tự ước tính)"
+users:              # người đặt đồ ăn qua app dùng trợ lý — 3 kịch bản
+  low: 910
+  base: 10000
+  high: 100000
+  source: "thấp: hơn 1.000 học viên AI20K khoá 5 (01-challenge-brief.md của bộ đề) × 21/23 người khảo sát có đặt đồ ăn qua app ≈ 910 · cơ sở 10.000 và cao 100.000: (tự ước tính) — quy mô một trường đại học / một quận khi tích hợp vào app giao đồ ăn; chưa có nguồn công khai về số người dùng app"
 
-personas:           # ≥3 kiểu người dùng; share cộng lại = 1
-  - name: dung_it
-    share: 0.5              # tỉ lệ người dùng kiểu này
-    uses_per_month: 4       # số phiên / người / tháng
-    turns_per_session: 1    # số lượt hỏi trong một phiên
-    source: "(ví dụ) phỏng vấn P1, P3 — thay bằng nguồn của nhóm"
-  - name: dung_vua
-    share: 0.3
-    uses_per_month: 10
-    turns_per_session: 3
-    source: "(ví dụ) khảo sát n = 24, câu 3"
-  - name: dung_nhieu
-    share: 0.2
-    uses_per_month: 20
-    turns_per_session: 5
-    source: "(ví dụ) data/preclass: đếm số lượt / người — cách đếm ở evidence/data-mining.md"
-# Mỗi lượt hỏi lấy ngẫu nhiên một đầu vào trong eval/benchmark.csv (type thuong và kho).
-# Persona hỏi kiểu riêng: thêm vào persona đó
-#     types: [thuong, kho, tu_choi]
-# hoặc
-#     inputs: ["câu hỏi kiểu 1", "câu hỏi kiểu 2"]
+personas:           # từ khảo sát câu 3 (đơn / tuần) × câu 4 (đơn trễ / 5 đơn gần nhất), 21 người có đặt đơn
+  - name: dat_it
+    share: 0.43             # 9/21 người đặt 1–2 đơn / tuần
+    uses_per_month: 1.7     # đơn trễ / người / tháng — evidence/survey/count_survey.py
+    turns_per_session: 1    # (tự ước tính)
+    source: "khảo sát câu 3 = '1–2' (9/21 người); câu 3 × câu 4 → ~1,7 đơn trễ / tháng (quy đổi điểm giữa, evidence/survey/count_survey.py); giả định mỗi đơn trễ mở trợ lý 1 lần (tự ước tính)"
+  - name: dat_vua
+    share: 0.33             # 7/21 người đặt 3–5 đơn / tuần
+    uses_per_month: 4.4
+    turns_per_session: 1
+    source: "khảo sát câu 3 = '3–5' (7/21 người); ~4,4 đơn trễ / tháng (count_survey.py); 1 lượt / phiên (tự ước tính)"
+  - name: dat_nhieu
+    share: 0.24             # 5/21 người đặt từ 6 đơn / tuần trở lên
+    uses_per_month: 11.0
+    turns_per_session: 2    # (tự ước tính) — người dùng nhiều hay hỏi thêm / đòi thêm
+    types: [thuong, kho, tu_choi]
+    source: "khảo sát câu 3 = '6–10' (1 người, ~13,8) và 'Trên 10' (4 người, ~10,3) → trung bình có trọng số ~11 đơn trễ / tháng (count_survey.py); 2 lượt / phiên và có câu tu_choi (tự ước tính)"
 
-prices:             # USD / 1 triệu token — chép từ further-reading/model-prices.md của repo đề. ≥2 mức model
-  - model: gemini-3.1-flash-lite
+prices:             # USD / 1 triệu token — từ further-reading/model-prices.csv của repo đề
+  - model: gpt-5-nano
+    input: 0.05
+    output: 0.40
+    source: "https://developers.openai.com/api/docs/pricing · xem 25/11/2026 (bảng giá bộ đề) — model đang dùng để đo"
+  - model: gpt-5-mini
     input: 0.25
-    output: 1.50
-    source: "(ví dụ) https://ai.google.dev/gemini-api/docs/pricing · xem 25/11/2026"
-  - model: gemini-4-hydrogen
-    input: 1.50
-    output: 7.50
-    source: "(ví dụ) https://ai.google.dev/gemini-api/docs/pricing · xem 25/11/2026"
+    output: 2.00
+    source: "https://developers.openai.com/api/docs/pricing · xem 25/11/2026 (bảng giá bộ đề)"
+  - model: gpt-6.1-terra
+    input: 1.00
+    output: 5.00
+    source: "https://developers.openai.com/api/docs/pricing · xem 25/11/2026 (bảng giá bộ đề) — mức 'Vừa'"
 
-usd_to_vnd:         # tuỳ chọn: điền thì bản tóm tắt in thêm tiền Việt
-  rate:
-  source:
+usd_to_vnd:
+  rate: 26000
+  source: "(tự ước tính) tỉ giá tham khảo tháng 11/2026"
